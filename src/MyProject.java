@@ -42,13 +42,22 @@ public class MyProject {
 
 
         addButton.addActionListener(e -> showAddDialog());
-//        editButton.addActionListener(e -> showEditDialog());
+        deleteButton.addActionListener(e -> deleteRecord());
+      editButton.addActionListener(e -> showEditDialog());
 
         frame.setVisible(true);
     }
 
+    private void deleteRecord() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(frame, "Please select a record to delete!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        tableModel.removeRow(selectedRow);
 
-    //write code here
+    }
+        //write code here
     private void showAddDialog() {
         JDialog dialog = new JDialog(frame, "Add Record", true);
         dialog.setSize(400, 300);
@@ -83,7 +92,42 @@ public class MyProject {
 
 
     // write code here
+    private void showEditDialog() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(frame, "Please select a record to edit!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        JDialog dialog = new JDialog(frame, "Edit Record", true);
+        dialog.setSize(400, 300);
+        dialog.setLayout(new GridLayout(columns.length + 1, 2));
+
+        JTextField[] fields = new JTextField[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            dialog.add(new JLabel(columns[i] + ":"));
+            fields[i] = new JTextField(tableModel.getValueAt(selectedRow, i).toString());
+            dialog.add(fields[i]);
+        }
+
+        JButton saveButton = new JButton("Save");
+        dialog.add(saveButton);
+
+        saveButton.addActionListener(e -> {
+            for (int i = 0; i < fields.length; i++) {
+                String value = fields[i].getText();
+                if (value.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "All fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                tableModel.setValueAt(value, selectedRow, i);
+            }
+
+            dialog.dispose();
+        });
+
+        dialog.setVisible(true);
+    }
 
 
     public static void main(String[] args) {
