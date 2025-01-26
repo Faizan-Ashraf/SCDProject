@@ -42,11 +42,12 @@ public class MyProject {
 
         addButton.addActionListener(e -> showAddDialog());
         deleteButton.addActionListener(e -> deleteRecord());
-      editButton.addActionListener(e -> showEditDialog());
+        editButton.addActionListener(e -> showEditDialog());
         addButton.addActionListener(e -> exportCSV());
 
         frame.setVisible(true);
     }
+
 
 
     private void deleteRecord() {
@@ -56,6 +57,7 @@ public class MyProject {
             return;
         }
         tableModel.removeRow(selectedRow);
+        saveCSV();
 
     }
 
@@ -149,12 +151,13 @@ public class MyProject {
                 }
                 tableModel.setValueAt(value, selectedRow, i);
             }
-
+            saveCSV();
             dialog.dispose();
         });
 
         dialog.setVisible(true);
-      
+    }
+
     private void exportCSV() {
         JFileChooser fileChooser = new JFileChooser();
         if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -178,3 +181,4 @@ public class MyProject {
         SwingUtilities.invokeLater(MyProject::new);
     }
 }
+
