@@ -1,17 +1,16 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.Vector;
 
 public class MyProject {
 
-    private JFrame frame;
-    private JTable table;
-    private DefaultTableModel tableModel;
+    private final JFrame frame;
+    private final JTable table;
+    private final DefaultTableModel tableModel;
     private final String[] columns = {"First Name", "Last Name", "Email", "Phone", "Location", "Hobby"};
-
+    private final String csvFile = "records.csv";
     public MyProject() {
 
         frame = new JFrame("InfoGrid - CRUD Application");
@@ -21,7 +20,7 @@ public class MyProject {
 
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
-
+        loadCSV();
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
@@ -44,9 +43,11 @@ public class MyProject {
         addButton.addActionListener(e -> showAddDialog());
         deleteButton.addActionListener(e -> deleteRecord());
       editButton.addActionListener(e -> showEditDialog());
+        addButton.addActionListener(e -> exportCSV());
 
         frame.setVisible(true);
     }
+
 
     private void deleteRecord() {
         int selectedRow = table.getSelectedRow();
@@ -57,7 +58,31 @@ public class MyProject {
         tableModel.removeRow(selectedRow);
 
     }
-        //write code here
+
+    private void loadCSV() {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                tableModel.addRow(data);
+            }
+        } catch (IOException e) {
+            System.out.println("No existing data found. Starting fresh.");
+        }
+    }
+
+
+    private void saveCSV() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                Vector<?> row = tableModel.getDataVector().elementAt(i);
+                pw.println(String.join(",", row.toArray(new String[0])));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void showAddDialog() {
         JDialog dialog = new JDialog(frame, "Add Record", true);
         dialog.setSize(400, 300);
@@ -83,6 +108,7 @@ public class MyProject {
                 }
             }
             tableModel.addRow(rowData);
+            saveCSV();
             dialog.dispose();
         });
 
@@ -92,6 +118,7 @@ public class MyProject {
 
 
     // write code here
+
     private void showEditDialog() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -127,6 +154,23 @@ public class MyProject {
         });
 
         dialog.setVisible(true);
+      
+    private void exportCSV() {
+        JFileChooser fileChooser = new JFileChooser();
+        if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (PrintWriter pw = new PrintWriter(file)) {
+                for (int i = 0; i < tableModel.getRowCount(); i++) {
+                    Vector<?> row = tableModel.getDataVector().elementAt(i);
+                    pw.println(String.join(",", row.toArray(new String[0])));
+                }
+                JOptionPane.showMessageDialog(frame, "CSV exported successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Error exporting CSV!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
     }
 
 
