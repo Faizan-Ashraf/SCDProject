@@ -83,6 +83,22 @@ public class MyProject {
 
 
     // write code here
+    private void exportCSV() {
+        JFileChooser fileChooser = new JFileChooser();
+        if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (PrintWriter pw = new PrintWriter(file)) {
+                for (int i = 0; i < tableModel.getRowCount(); i++) {
+                    Vector<?> row = tableModel.getDataVector().elementAt(i);
+                    pw.println(String.join(",", row.toArray(new String[0])));
+                }
+                JOptionPane.showMessageDialog(frame, "CSV exported successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Error exporting CSV!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 
 
 
