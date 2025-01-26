@@ -43,7 +43,7 @@ public class MyProject {
         addButton.addActionListener(e -> showAddDialog());
         deleteButton.addActionListener(e -> deleteRecord());
         editButton.addActionListener(e -> showEditDialog());
-        addButton.addActionListener(e -> exportCSV());
+        exportButton.addActionListener(e -> exportCSV());
 
         frame.setVisible(true);
     }
